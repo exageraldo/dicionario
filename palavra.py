@@ -1,31 +1,39 @@
+from unidecode import unidecode
+from ftfy import fix_text
 from lxml import html
-import unidecode
 import requests
 
 
 class Dicionario:
     @staticmethod
     def sinonimos(palavra):
-        palavra = unidecode.unidecode(palavra)
-        page = requests.get('https://www.sinonimos.com.br/' + palavra + '/')
+        url = 'https://www.sinonimos.com.br/' + unidecode(palavra) + '/'
+        page = requests.get(url)
         tree = html.fromstring(page.content)
         sinonimos = tree.xpath('//*[@id="content"]/div[1]/div[@class="s-wrapper"]/p/a//text()')
-        return sinonimos
+        if sinonimos:
+            sinonimos = [fix_text(sinonimo) for sinonimo in sinonimos]
+            return sinonimos
+        return {'status': 'Não encontrado', 'url': url}
 
     @staticmethod
     def antonimos(palavra):
-        palavra = unidecode.unidecode(palavra)
-        page = requests.get('https://www.antonimos.com.br/' + palavra + '/')
+        url = 'https://www.antonimos.com.br/' + unidecode(palavra) + '/'
+        page = requests.get(url)
         tree = html.fromstring(page.content)
-        antonimos = tree.xpath(
-            '//*[@id="content"]//div[@class="s-wrapper"]/p/a//text()')
-        return antonimos
+        antonimos = tree.xpath('//*[@id="content"]//div[@class="s-wrapper"]/p/a//text()')
+        if antonimos:
+            antonimos = [fix_text(antonimo) for antonimo in antonimos]
+            return antonimos
+        return {'status': 'Não encontrado', 'url': url}
 
     @staticmethod
     def significados(palavra):
-        palavra = unidecode.unidecode(palavra)
-        page = requests.get('https://www.dicio.com.br/' + palavra + '/')
+        url = 'https://www.dicio.com.br/' + unidecode(palavra) + '/'
+        page = requests.get(url)
         tree = html.fromstring(page.content)
         significados = tree.xpath('//*[@id="content"]/div[1]/p[1]/span/text()')
-        significados = [significado.strip() for significado in significados[0: -2]]
-        return significados
+        if significados:
+            significados = [fix_text(significado.strip()) for significado in significados[0: -2]]
+            return significados
+        return {'status': 'Não encontrado', 'url': url}
