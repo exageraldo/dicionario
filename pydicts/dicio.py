@@ -36,7 +36,3 @@ class Dicio:
             for meaning in meanings_list:
                 yield meaning
         return {'status': 'Word not found', 'url': meanings['url']}
-
-# import pydicts
-# amor = pydicts.Dicio.conjugation('amar')
-# for a in amor: print(a)
